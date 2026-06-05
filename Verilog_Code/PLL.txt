@@ -1,0 +1,7 @@
+module pll(
+input wire clk_in, input wire reset, output reg clk_out, output reg locked
+);
+initial begin clk_out = 0;
+locked = 0;
+#50 locked = 1; end
+always #3 clk_out = ~clk_out; // ~166 MHz endmodule

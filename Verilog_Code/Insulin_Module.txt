@@ -1,0 +1,22 @@
+
+
+module insulin_module ( input wire	clk,
+input wire	rst,
+input wire [15:0] weight, input wire [15:0] age,
+input wire [15:0] prev_insulin, input wire [15:0] prev_glucose, input wire [15:0] current_glucose, output reg [31:0] insulin_out
+);
+parameter TARGET = 5; parameter KP = 3; parameter KI = 1;
+reg signed [31:0] error; reg signed [31:0] integral;
+reg signed [31:0] delta_glucose; reg signed [31:0] insulin_calc;
+always @(posedge clk or posedge rst) begin
+if(rst) begin
+insulin_out <= 0;
+integral <= 0; end
+else
+ 
+begin
+error <= current_glucose - TARGET; delta_glucose <= current_glucose - prev_glucose; integral <= error;
+insulin_calc <= prev_insulin +
+(KP * error) + (KI * integral) + delta_glucose;
+insulin_out <= insulin_calc; end
+end endmodule

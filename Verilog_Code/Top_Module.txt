@@ -1,0 +1,39 @@
+
+module top_insulin_system ( input wire	clk_in,
+input wire	rst,
+input wire	start, input wire [15:0] weight, input wire [15:0] age,
+input wire [15:0] prev_insulin, input wire [15:0] prev_glucose, input wire [15:0] current_glucose, output wire [31:0] final_insulin, output wire	done
+);
+wire clk_fast; wire pll_locked; pll PLL_INST(
+.clk_in(clk_in),
+.reset(rst),
+.clk_out(clk_fast),
+.locked(pll_locked)
+);
+wire [4:0] state; fsm FSM_INST(
+.clk(clk_fast),
+.rst(rst),
+.start(start),
+.done(done),
+.state(state)
+ 
+);
+wire [31:0] insulin_value; insulin_module INS_INST(
+.clk(clk_fast),
+.rst(rst),
+.weight(weight),
+.age(age),
+.prev_insulin(prev_insulin),
+.prev_glucose(prev_glucose),
+.current_glucose(current_glucose),
+.insulin_out(insulin_value)
+);
+wire [31:0] ram_out; dual_port_ram RAM_INST(
+.clk(clk_fast),
+.addr_a(8'd0),
+.addr_b(8'd0),
+.data_in(insulin_value),
+.we(state == 5'd20),
+.data_out(ram_out)
+);
+assign final_insulin = ram_out; endmodule

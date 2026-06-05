@@ -1,0 +1,29 @@
+
+
+module fsm( input clk, input rst, input start,
+output reg done, output reg [4:0] state
+);
+parameter IDLE = 5'd0; parameter LOAD = 5'd1; parameter CALC1 = 5'd2; parameter CALC2 = 5'd3;
+ 
+parameter WRITE = 5'd20; reg [4:0] next_state;
+always @(posedge clk or posedge rst) begin if (rst)
+state <= IDLE; else
+state <= next_state;
+end
+always @(*) begin next_state = state; case(state)
+IDLE:
+if(start)
+next_state = LOAD; LOAD:
+next_state = CALC1; CALC1:
+next_state = CALC2; CALC2:
+next_state = WRITE; WRITE:
+next_state = IDLE; default:
+next_state = IDLE; endcase
+end
+always @(posedge clk or posedge rst) begin if(rst)
+done <= 0;
+else
+ 
+done <= (state == WRITE);
+end
+endmodule
